@@ -48,20 +48,19 @@ class CurrencyRateService
         Cache::get($from->toDateString().$to->toDateString(), static function () use ($from, $to, $externalService) {
             foreach (CarbonPeriod::dates($from, $to)->toArray() as $date) {
                 sleep(1);
-                self::store($externalService->onDate($date->toMutable()));
+                CurrencyRateLogRepository::saveBatch($externalService->onDate($date->toMutable()));
             }
         });
     }
 
     /**
-     * @param Collection<CurrencyRateData> $rates
-     * @throws Throwable
+     * @throws CurrencyRateException
      */
-    protected static function store(Collection $rates): void
+    protected function validate(CurrencyRateRequestData $requestData): void
     {
-        $rates->each(function (CurrencyRateData $currencyRate) {
-            CurrencyRateLogRepository::save($currencyRate);
-        });
+        if ($requestData->baseCurrency !== CurrencyEnum::DEFAULT->value) {
+            throw new CurrencyRateException('This base currency is not supported!');
+        }
     }
 
     /**
@@ -107,15 +106,5 @@ class CurrencyRateService
         $currencyRate->differenceRate = (string)($rates->first() - $rates->last());
 
         return $currencyRate;
-    }
-
-    /**
-     * @throws CurrencyRateException
-     */
-    protected function validate(CurrencyRateRequestData $requestData): void
-    {
-        if ($requestData->baseCurrency !== CurrencyEnum::DEFAULT->value) {
-            throw new CurrencyRateException('This base currency is not supported!');
-        }
     }
 }
