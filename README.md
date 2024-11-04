@@ -9,8 +9,9 @@
 
 ## Commands
 
-#### Prepare for usage sail
+### Prepare for usage
 
+#### Prepare sail
 ````
 docker run --rm --interactive --tty \
   --volume $PWD:/app \
@@ -22,27 +23,31 @@ docker run --rm --interactive --tty \
 alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
 ````
 
-````
-sail artisan sail:publish
-````
 #### Copy .env.example to .env
+````
+cp .env.example .env
+````
 
 #### App start
 ````
 sail up -d
+````
+or
+````
+docker-compose up -d
 ````
 
 #### Bash into container
 ````
 sail shell
 ````
+or
+````
+docker exec -it currency-microservice-laravel.test-1 bash
+````
 #### Migrate db tables
 ````
 php artisan migrate
-````
-#### Start consuming
-````
-php artisan rabbitmq:consume
 ````
 
 #### Seed database
@@ -59,6 +64,11 @@ php artisan currency:fetch-rates-by-period
 ````
 
 ### RabbitMQ
+
+#### Start consuming
+````
+php artisan rabbitmq:consume
+````
 
 #### Queue name
 ````

@@ -1,6 +1,6 @@
 <?php
 
-namespace Database\Factories;
+namespace Database\Factories\Currency;
 
 use App\Models\Currency\CurrencyRateLog;
 use Illuminate\Database\Eloquent\Factories\Factory;

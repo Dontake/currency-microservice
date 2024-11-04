@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Console\Commands\Currency;
 
 use App\External\Exceptions\Currency\CurrencyRateException;
-use App\Jobs\Currency\FetchCurrencyRate;
 use App\Services\Currency\CurrencyRateService;
 use Illuminate\Console\Command;
 
