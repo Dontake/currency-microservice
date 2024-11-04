@@ -88,7 +88,7 @@ final class CbrClient
 
         return Collection::make($response)->map(static function (object $item) use ($onDate) {
             return new CurrencyRateData(
-                $item->VcharCode,
+                $item->VchCode ?? '',
                 $item->VunitRate,
                 baseCurrency: CurrencyEnum::DEFAULT->value,
                 rateDate: $onDate
@@ -130,7 +130,7 @@ final class CbrClient
         }
     }
 
-    private function getXmlResponse(Response $response): SimpleXMLElement|false
+    private function getXmlResponse(Response $response): SimpleXMLElement
     {
         return simplexml_load_string($response->getBody()->getContents());
     }

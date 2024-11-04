@@ -9,17 +9,31 @@
 
 ## Commands
 
-#### Prepare for usage
+#### Prepare for usage sail
+
 ````
-alias sail='vendor/bin/sail'
+docker run --rm --interactive --tty \
+  --volume $PWD:/app \
+  --user $(id -u):$(id -g) \
+  composer install --ignore-platform-reqs
+````
+
+````
+alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
 ````
 
 #### App start
 ````
-sail up
+sail up -d
 ````
+
+#### Bash into container
 ````
 sail shell
+````
+#### Migrate db tables
+````
+php artisan migrate
 ````
 #### Start consuming
 ````

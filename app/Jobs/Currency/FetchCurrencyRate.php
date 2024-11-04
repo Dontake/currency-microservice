@@ -15,8 +15,7 @@ final class FetchCurrencyRate implements ShouldQueue
     use Queueable;
 
     public function __construct(
-        public Carbon $from,
-        public Carbon $to
+        public Carbon $date,
     ) {}
 
     /**
@@ -24,6 +23,6 @@ final class FetchCurrencyRate implements ShouldQueue
      */
     public function handle(CurrencyRateService $currencyRateService): void
     {
-        $currencyRateService->fetchRatesByPeriod($this->from, $this->to);
+        $currencyRateService->getRatesOnDate($this->date);
     }
 }

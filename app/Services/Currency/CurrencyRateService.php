@@ -9,6 +9,7 @@ use App\Enums\CurrencyEnum;
 use App\External\Data\Currency\CurrencyRateData;
 use App\External\Exceptions\Currency\CurrencyRateException;
 use App\External\Services\Currency\CurrencyRateServiceInterface;
+use App\Jobs\Currency\FetchCurrencyRate;
 use App\Jobs\Currency\ResponseCurrencyRate;
 use App\Repositories\Currency\CurrencyRateLogRepository;
 use Carbon\Carbon;
@@ -43,13 +44,17 @@ class CurrencyRateService
      */
     public function fetchRatesByPeriod(Carbon $from, Carbon $to): void
     {
+        foreach (CarbonPeriod::dates($from, $to)->toArray() as $date) {
+            FetchCurrencyRate::dispatch($date)->delay(1);
+        }
+    }
+
+    public function getRatesOnDate(Carbon $date): void
+    {
         $externalService = $this->externalService;
 
-        Cache::get($from->toDateString().$to->toDateString(), static function () use ($from, $to, $externalService) {
-            foreach (CarbonPeriod::dates($from, $to)->toArray() as $date) {
-                sleep(1);
-                CurrencyRateLogRepository::saveBatch($externalService->onDate($date->toMutable()));
-            }
+        Cache::get($date->toDateString(), static function () use ($date, $externalService) {
+            CurrencyRateLogRepository::saveBatch($externalService->onDate($date->toMutable()));
         });
     }
 
@@ -96,10 +101,11 @@ class CurrencyRateService
             throw new CurrencyRateException('Rate not found');
         }
 
+        $currencyRates->sortByDesc('rareDate');
         $rates = $currencyRates->pluck('rate');
 
         /** @var CurrencyRateData $currencyRate */
-        $currencyRate = $currencyRates->sortByDesc('rareDate')->first();
+        $currencyRate = $currencyRates->first();
 
         $currencyRate->rateDate = $currencyRate->rateDate ?? $requestData->date;
         $currencyRate->baseCurrency = $requestData->baseCurrency;
