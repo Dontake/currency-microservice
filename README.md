@@ -22,6 +22,11 @@ docker run --rm --interactive --tty \
 alias sail='sh $([ -f sail ] && echo sail || echo vendor/bin/sail)'
 ````
 
+````
+sail artisan sail:publish
+````
+#### Copy .env.example to .env
+
 #### App start
 ````
 sail up -d
